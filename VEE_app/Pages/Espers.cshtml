@@ -1,0 +1,71 @@
+﻿@page
+@model EspersModel
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Уровень достоверности
+            </th>
+            <th>
+                Текущее предположение
+            </th>
+            <th>
+                Имя экстрасенса
+            </th>
+            <th>
+                История угаданных чисел
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in @Model.Espers)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reliability_lvl)
+                </td>
+                <td>
+                    @if(item.Current_guess != -1) @Html.DisplayFor(modelItem => item.Current_guess)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                @foreach (var numb in item.Guessed_numbers)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => numb)
+                    </td>
+                }
+            </tr>
+        }
+        <tr>
+            
+            <td>          
+             </td>             
+            <td>          
+             </td>
+            <th>
+                Ранее загаданные числа
+            </th>           
+            @foreach (var numb in @Model.NumbHistory)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => numb)
+                </td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+<br />
+<br />
+<form method="post">
+    <input type="submit" value="Загадать число" />
+</form>
+<br />
+<form method="post">
+    <label for="cur_numb">Загаданное число</label><br />
+    <input type="number" name="cur_numb" id="cur_numb" /><br /><br />
+    <input type="submit" value="Оправить загаданное число" />
+</form>
