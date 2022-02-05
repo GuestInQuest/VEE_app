@@ -19,19 +19,19 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in @Model.Espers)
+        @foreach (var item in @Model.espers)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Reliability_lvl)
+                    @Html.DisplayFor(modelItem => item.reliabilityLevel)
                 </td>
                 <td>
-                    @if(item.Current_guess != -1) @Html.DisplayFor(modelItem => item.Current_guess)
+                    @if(item.currentGuess != -1) @Html.DisplayFor(modelItem => item.currentGuess)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.DisplayFor(modelItem => item.name)
                 </td>
-                @foreach (var numb in item.Guessed_numbers)
+                @foreach (var numb in item.guessedNumbers)
                 {
                     <td>
                         @Html.DisplayFor(modelItem => numb)
@@ -48,7 +48,7 @@
             <th>
                 Ранее загаданные числа
             </th>           
-            @foreach (var numb in @Model.NumbHistory)
+            @foreach (var numb in @Model.tester.numbHistory)
             {
                 <td>
                     @Html.DisplayFor(modelItem => numb)
@@ -59,13 +59,21 @@
 </table>
 
 <br />
+@if (@Model.pageState == 1)
+{
 <br />
-<form method="post">
+<label>Загадайте двузначное число</label><br />
+<form asp-page-handler="guess" method="post">
     <input type="submit" value="Загадать число" />
 </form>
+}
+else if (@Model.pageState == 2)
+{
 <br />
-<form method="post">
-    <label for="cur_numb">Загаданное число</label><br />
-    <input type="number" name="cur_numb" id="cur_numb" /><br /><br />
+<form asp-page-handler="unveil" method="post">
+    <label for="SubmittedNumb">Загаданное число</label><br />
+    <input type="number" name="SubmittedNumb" id="SubmittedNumb" />
+    @Html.ValidationMessageFor(model => model.SubmittedNumb)<br /><br />
     <input type="submit" value="Оправить загаданное число" />
 </form>
+}

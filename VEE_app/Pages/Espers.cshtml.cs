@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using VEE_app.Models;
 
@@ -25,89 +24,77 @@ namespace VEE_app.Pages
     public class EspersModel : PageModel
     {
         public const string SessionKeyEspers = "_Espers";
-        public const string SessionKeyNumbHistory = "_NumbHistory";
-
-        public string SessionInfo_CurrentTime { get; private set; }
-        public string SessionInfo_SessionTime { get; private set; }
-        public string SessionInfo_MiddlewareValue { get; private set; }
+        public const string SessionKeyEspersCount = "_EspersCount";
+        public const string SessionKeyTester = "_Tester";
 
         private readonly ILogger<EspersModel> _logger;
+
+        [BindProperty]
+        public int SubmittedNumb { get; set; }
+        public Tester tester { get; set; }
+
+        public List<Esper> espers { get; set; }
+
+        public int pageState { get; set; } // Состояние страницы (1-загадываем число, 2-вводим загаданное число)
+        public int espersCount { get; set; }
 
         public EspersModel(ILogger<EspersModel> logger)
         {
             _logger = logger;
         }
 
-        [BindProperty]
-        public int cur_numb { get; set; }
-        public List<int> NumbHistory { get; set; }
-        public List<Esper> Espers { get; set; }
         public void InitObjects()
         {
-            Espers = new List<Esper>
-                { new Esper
-                    {
-                        Reliability_lvl = 100,
-                        Current_guess = -1,
-                        Name = "Великий экстрасенс",
-                        Guessed_numbers = new List<int>()
-                    },
-                  new Esper
-                    {
-                        Reliability_lvl = 100,
-                        Current_guess = -1,
-                        Name = "Шаман",
-                        Guessed_numbers = new List<int>()
-                    },
-                  new Esper
-                    {
-                        Reliability_lvl = 100,
-                        Current_guess = -1,
-                        Name = "Потомственный красный колдун",
-                        Guessed_numbers = new List<int>()
-                    },
-                  new Esper
-                    {
-                        Reliability_lvl = 100,
-                        Current_guess = -1,
-                        Name = "Прорицатель",
-                        Guessed_numbers = new List<int>()
-                    },
-                  new Esper
-                    {
-                        Reliability_lvl = 100,
-                        Current_guess = -1,
-                        Name = "Всевидящая",
-                        Guessed_numbers = new List<int>()
-                    },
-                };
-            NumbHistory = new List<int>();
+            List<string> names = new List<string> { "Всевидящая",
+                                                    "Прорицатель",
+                                                    "Потомственный красный колдун",
+                                                    "Шаман",
+                                                    "Великий экстрасенс",
+                                                    "Отшельник",
+                                                    "Иллюзионист",
+                                                    "Психолог",
+                                                    "Обманщик",
+                                                    "Шарлатан"};
+            var rand = new System.Random();
+            espersCount = rand.Next(2, 11);
+            espers = new List<Esper>();
+            //При создании экстрасенсов удаляем из списка уже использованные имена
+            for (int i = 0, j = 0; i < espersCount; i++)
+            {
+                j = rand.Next(0, names.Count);
+                espers.Add(new Esper(names[j]));
+                names.RemoveAt(j);
+            }
+            tester = new Tester();
+            pageState = 1;
         }
+
         public void SaveObjects()
         {
             var i = 0;
-            foreach (Esper e in Espers)
+            foreach (Esper e in espers)
             {
                 HttpContext.Session.Set<Esper>(i + SessionKeyEspers, e);
                 i++;
             }
-            HttpContext.Session.Set<List<int>>(SessionKeyNumbHistory, NumbHistory);
+            HttpContext.Session.Set<Tester>(SessionKeyTester, tester);
+            HttpContext.Session.Set<int>(SessionKeyEspersCount, espersCount);
         }
+
         public void LoadObjects()
         {
-            Espers = new List<Esper>();
-            NumbHistory = new List<int>();
-            NumbHistory = HttpContext.Session.Get<List<int>>(SessionKeyNumbHistory);
-            for (int i = 0; i < 5; ++i)
+            espers = new List<Esper>();
+            espersCount = HttpContext.Session.Get<int>(SessionKeyEspersCount);
+            tester = HttpContext.Session.Get<Tester>(SessionKeyTester);
+            for (int i = 0; i < espersCount; ++i)
             {
-                Espers.Add(HttpContext.Session.Get<Esper>(i + SessionKeyEspers));
+                espers.Add(HttpContext.Session.Get<Esper>(i + SessionKeyEspers));
             }
         }
 
         public void OnGet()
-        {
-            
-            if (HttpContext.Session.Get<List<int>>(SessionKeyNumbHistory) == default)
+        {            
+            if (HttpContext.Session.Get<int>(SessionKeyEspersCount) == default)
             {
                 InitObjects();
                 SaveObjects();
@@ -117,28 +104,36 @@ namespace VEE_app.Pages
                 LoadObjects();
             }
         }
-        public void OnPost()
+
+        public void OnPostGuess()
         {
             LoadObjects();
-            if (Espers[0].Current_guess == -1)
             {
-                var rand = new Random();
-                foreach (Esper e in Espers)
-                    e.Current_guess = rand.Next(10);
+                foreach (Esper e in espers)
+                    e.GuessNumber();
             }
-            else
+            SaveObjects();
+            pageState = 2;
+        }
+
+        public void OnPostUnveil()
+        {
+            LoadObjects();
             {
-                NumbHistory.Insert(0, cur_numb);
-                foreach (Esper e in Espers)
+                if (tester.AddNumber(SubmittedNumb))
                 {
-                    if (e.Current_guess == cur_numb) 
-                        e.Reliability_lvl += 5;
-                    else
-                        e.Reliability_lvl -= 5;
-                    e.Guessed_numbers.Insert(0, e.Current_guess);
-                    e.Current_guess = -1;
+                    foreach (Esper e in espers)
+                    {
+                        e.ReliabilityCheck(tester.currentNumber);
+                    }
+                    tester.ArchiveNumber();
+                    pageState = 1;
                 }
-                cur_numb = -1;
+                else
+                {
+                    ModelState.AddModelError("SubmittedNumb", "Попробуйте ещё раз, загадать нужно было двузначное число");
+                    pageState = 2;
+                }
             }
             SaveObjects();
         }
