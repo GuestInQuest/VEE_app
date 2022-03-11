@@ -4,11 +4,11 @@ namespace VEE_app.Models
 {
     public class Esper
     {
-        public bool guessIsMade { get; set; }
+        public string name { get; set; }
         public int reliabilityLevel { get; set; }
         public int currentGuess { get; set; }
-        public string name { get; set; }
         public System.Collections.Generic.List<int> guessedNumbers { get; set; }
+        public bool guessIsMade { get; set; }
         private int reliabilityStep;
         public Esper()
         {

@@ -11,10 +11,6 @@ namespace VEE_app.Pages
     
     public class EspersModel : PageModel
     {
-        public const string SessionKeyEspers = "_Espers";
-        public const string SessionKeyEspersCount = "_EspersCount";
-        public const string SessionKeyTester = "_Tester";
-
         private readonly ILogger<EspersModel> _logger;
 
         [BindProperty]
@@ -51,7 +47,6 @@ namespace VEE_app.Pages
             game.GuessNumberByEspers();
             SaveGameData();
             return RedirectToPage("/Espers");
-
         }
 
         public IActionResult OnPostUnveil()

@@ -19,10 +19,10 @@ namespace VEE_app.Models
 
     public interface IAbstractGame
     {
-        GameStates gameState { get; set; }
         Tester tester { get; set; }
         List<Esper> espers { get; set; }
         int espersCount { get; set; }
+        GameStates gameState { get; set; }
         bool hasError { get; set; }
         string errorMessage { get; set; }
         void GuessNumberByEspers();
@@ -39,10 +39,10 @@ namespace VEE_app.Models
 
     public class Game: IAbstractGame
     {
-        public GameStates gameState { get; set; }
         public Tester tester { get; set; }
         public List<Esper> espers { get; set; }
         public int espersCount { get; set; }
+        public GameStates gameState { get; set; }
         public bool hasError { get; set; }
         public string errorMessage { get; set; }
 

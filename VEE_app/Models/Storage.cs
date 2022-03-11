@@ -79,7 +79,7 @@ namespace VEE_app.Models
             return game;
         }
 
-        public IAbstractGame SaveGameData(IAbstractGame game)
+        public void SaveGameData(IAbstractGame game)
         {
             var i = 0;
             foreach (Esper e in game.espers)
@@ -92,10 +92,9 @@ namespace VEE_app.Models
             httpContextAccessor.HttpContext.Session.Set<bool>(SessionKeyHasError, game.hasError);
             httpContextAccessor.HttpContext.Session.Set<string>(SessionKeyErrorMessage, game.errorMessage);
             httpContextAccessor.HttpContext.Session.Set<GameStates>(SessionKeyGameState, game.gameState);
-            return game;
-    }
+        }
 
-        public IAbstractGame getGameData(IAbstractGame game)
+        public void getGameData(IAbstractGame game)
         {
             if (httpContextAccessor.HttpContext.Session.Get<int>(SessionKeyEspersCount) == default)
             {
@@ -106,7 +105,6 @@ namespace VEE_app.Models
             {
                 LoadData(game);
             }
-            return game;
         }
     }
 }
