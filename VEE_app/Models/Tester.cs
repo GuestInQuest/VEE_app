@@ -9,25 +9,34 @@ namespace VEE_app.Models
     {
         public int currentNumber { get; set; }
         public List<int> numbHistory { get; set; }
+        private bool numberIsArchived;
 
         public Tester()
         {
             numbHistory = new List<int>();
+            numberIsArchived = false;
         }
 
-        public bool AddNumber(int numb)
+        public bool ValidateNumber(int number)
         {
-            if (numb is < 10 or > 99)
+            if (number is < 10 or > 99)
                 return false;
-            currentNumber = numb;
-            return true;
+            else return true;
+        }
+
+        public void AddNumber(int number)
+        {
+            currentNumber = number;
+            numberIsArchived = false;
         }
 
         public void ArchiveNumber()
         {
-            if(currentNumber != -1)
+            if (!numberIsArchived)
+            {
                 numbHistory.Insert(0, currentNumber);
-            currentNumber = -1;
+                numberIsArchived = true;
+            }
         }
     }
 }

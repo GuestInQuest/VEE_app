@@ -4,6 +4,7 @@ namespace VEE_app.Models
 {
     public class Esper
     {
+        public bool guessIsMade { get; set; }
         public int reliabilityLevel { get; set; }
         public int currentGuess { get; set; }
         public string name { get; set; }
@@ -12,7 +13,7 @@ namespace VEE_app.Models
         public Esper()
         {
             reliabilityLevel = 100;
-            currentGuess = -1;
+            guessIsMade = false;
             this.name = "Случайный экстрасенс №" + (new System.Random()).Next().ToString();
             guessedNumbers = new List<int>();
             reliabilityStep = 5;
@@ -21,7 +22,7 @@ namespace VEE_app.Models
         public Esper(string name)
         {
             reliabilityLevel = 100;
-            currentGuess = -1;
+            guessIsMade = false;
             this.name = name;
             guessedNumbers = new List<int>();
             reliabilityStep = 5;
@@ -30,7 +31,7 @@ namespace VEE_app.Models
         public Esper(string Name, int ReliabilityLevel)
         {
             this.reliabilityLevel = ReliabilityLevel;
-            currentGuess = -1;
+            guessIsMade = false;
             this.name = Name;
             guessedNumbers = new List<int>();
         }
@@ -38,7 +39,7 @@ namespace VEE_app.Models
         public Esper(int ReliabilityLevel)
         {
             this.reliabilityLevel = ReliabilityLevel;
-            currentGuess = -1;
+            guessIsMade = false;
             this.name = "Случайный экстрасенс №" + (new System.Random()).Next().ToString(); 
             guessedNumbers = new List<int>();
         }
@@ -46,6 +47,7 @@ namespace VEE_app.Models
         public void GuessNumber()
         {
             currentGuess = new System.Random().Next(10,100);
+            guessIsMade = true;
         }
         
         public void ReliabilityCheck(int CurrentNumb)
@@ -54,8 +56,12 @@ namespace VEE_app.Models
                 reliabilityLevel += reliabilityStep;
             else
                 reliabilityLevel -= reliabilityStep;
+        }
+
+        public void PrepareToGuess()
+        {
             guessedNumbers.Insert(0, currentGuess);
-            currentGuess = -1;
+            guessIsMade = false;
         }
     }
 }

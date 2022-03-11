@@ -19,14 +19,14 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in @Model.espers)
+        @foreach (var item in @Model.GetEspers())
         {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.reliabilityLevel)
                 </td>
                 <td>
-                    @if(item.currentGuess != -1) @Html.DisplayFor(modelItem => item.currentGuess)
+                    @if(item.guessIsMade) @Html.DisplayFor(modelItem => item.currentGuess)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.name)
@@ -39,27 +39,27 @@
                 }
             </tr>
         }
-        <tr>
-            
-            <td>          
-             </td>             
-            <td>          
-             </td>
-            <th>
-                Ранее загаданные числа
-            </th>           
-            @foreach (var numb in @Model.tester.numbHistory)
-            {
-                <td>
-                    @Html.DisplayFor(modelItem => numb)
-                </td>
-            }
-        </tr>
+    <tr>
+
+        <td>
+        </td>
+        <td>
+        </td>
+        <th>
+            Ранее загаданные числа
+        </th>
+        @foreach (var numb in @Model.GetTester().numbHistory)
+        {
+            <td>
+                @Html.DisplayFor(modelItem => numb)
+            </td>            
+        }
+    </tr>
     </tbody>
 </table>
 
 <br />
-@if (@Model.pageState == 1)
+@if (@Model.GetGameState() == Models.GameStates.EspersReadyToGuess)
 {
 <br />
 <label>Загадайте двузначное число</label><br />
@@ -67,13 +67,13 @@
     <input type="submit" value="Загадать число" />
 </form>
 }
-else if (@Model.pageState == 2)
+else if (@Model.GetGameState() == Models.GameStates.EspersGuessedNumber)
 {
 <br />
 <form asp-page-handler="unveil" method="post">
-    <label for="SubmittedNumb">Загаданное число</label><br />
-    <input type="number" name="SubmittedNumb" id="SubmittedNumb" />
-    @Html.ValidationMessageFor(model => model.SubmittedNumb)<br /><br />
+    <label for="SubmittedNumber">Загаданное число</label><br />
+    <input type="number" name="SubmittedNumber" id="SubmittedNumber" />
+    @Html.ValidationMessageFor(model => model.SubmittedNumber)<br /><br />
     <input type="submit" value="Оправить загаданное число" />
 </form>
 }
