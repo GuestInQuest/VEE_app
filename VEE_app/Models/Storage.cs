@@ -23,51 +23,33 @@ namespace VEE_app.Models
     public class Storage
     {
         private IHttpContextAccessor httpContextAccessor;
-
+        private readonly IFactory factory;
+        /*
         public const string SessionKeyEspers = "_Espers";
         public const string SessionKeyErrorMessage = "_ErrorMessage";
         public const string SessionKeyHasError = "_HasError";
         public const string SessionKeyGameState = "_GameState";
         public const string SessionKeyEspersCount = "_EspersCount";
         public const string SessionKeyTester = "_Tester";
-
-        public Storage()
+        */
+        public const string SessionKeyGame = "_Game";
+        
+        public Storage(IFactory factory)
         {
             httpContextAccessor = new HttpContextAccessor();
+            this.factory = factory;
         }
 
-        private IAbstractGame InitData(IAbstractGame game)
+        private Game InitData(IGame game)
         {
-            List<string> names = new List<string> { "Всевидящая",
-                                                    "Прорицатель",
-                                                    "Потомственный красный колдун",
-                                                    "Шаман",
-                                                    "Великий экстрасенс",
-                                                    "Отшельник",
-                                                    "Иллюзионист",
-                                                    "Психолог",
-                                                    "Обманщик",
-                                                    "Шарлатан"};
-            var rand = new System.Random();
-            game.espersCount = rand.Next(2, 11);
-            game.espers = new List<Esper>();
-            //При создании экстрасенсов удаляем из списка уже использованные имена
-            for (int i = 0, j = 0; i < game.espersCount; i++)
-            {
-                j = rand.Next(0, names.Count);
-                game.espers.Add(new Esper(names[j]));
-                names.RemoveAt(j);
-            }
-            game.hasError = false;
-            game.tester = new Tester();
-            return game;
+            return factory.Create().NewGame();
         }
 
-        private IAbstractGame LoadData(IAbstractGame game)
-        {
+        private IGame LoadData(IGame game)
+        {/*
             game.espers = new List<Esper>();
             game.espersCount = httpContextAccessor.HttpContext.Session.Get<int>(SessionKeyEspersCount);
-            game.tester = httpContextAccessor.HttpContext.Session.Get<Tester>(SessionKeyTester);
+            game.Tester = httpContextAccessor.HttpContext.Session.Get<Tester>(SessionKeyTester);
             for (int i = 0; i < game.espersCount; ++i)
             {
                 game.espers.Add(httpContextAccessor.HttpContext.Session.Get<Esper>(i + SessionKeyEspers));
@@ -76,25 +58,30 @@ namespace VEE_app.Models
             game.hasError = httpContextAccessor.HttpContext.Session.Get<bool>(SessionKeyHasError);
             game.errorMessage = httpContextAccessor.HttpContext.Session.Get<string>(SessionKeyErrorMessage);
             game.gameState = httpContextAccessor.HttpContext.Session.Get<GameStates>(SessionKeyGameState);
+            */
+            game = httpContextAccessor.HttpContext.Session.Get<Game>(SessionKeyGame);
             return game;
         }
 
-        public void SaveGameData(IAbstractGame game)
+        public void SaveGameData(Game game)
         {
+            /*
             var i = 0;
             foreach (Esper e in game.espers)
             {
                 httpContextAccessor.HttpContext.Session.Set<Esper>(i + SessionKeyEspers, e);
                 i++;
             }
-            httpContextAccessor.HttpContext.Session.Set<Tester>(SessionKeyTester, game.tester);
+            httpContextAccessor.HttpContext.Session.Set<Tester>(SessionKeyTester, game.Tester);
             httpContextAccessor.HttpContext.Session.Set<int>(SessionKeyEspersCount, game.espersCount);
             httpContextAccessor.HttpContext.Session.Set<bool>(SessionKeyHasError, game.hasError);
             httpContextAccessor.HttpContext.Session.Set<string>(SessionKeyErrorMessage, game.errorMessage);
             httpContextAccessor.HttpContext.Session.Set<GameStates>(SessionKeyGameState, game.gameState);
+            */
+            httpContextAccessor.HttpContext.Session.Set<Game>(SessionKeyGameState, game);
         }
 
-        public void getGameData(IAbstractGame game)
+        public void getGameData(Game game)
         {
             if (httpContextAccessor.HttpContext.Session.Get<int>(SessionKeyEspersCount) == default)
             {

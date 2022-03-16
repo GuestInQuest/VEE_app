@@ -21,27 +21,20 @@ namespace VEE_app.Models
 
         public Esper(string name)
         {
-            reliabilityLevel = 100;
-            guessIsMade = false;
+            _ = new Esper();
             this.name = name;
-            guessedNumbers = new List<int>();
-            reliabilityStep = 5;
         }
 
-        public Esper(string Name, int ReliabilityLevel)
+        public Esper(string name, int reliabilityLevel)
         {
-            this.reliabilityLevel = ReliabilityLevel;
-            guessIsMade = false;
-            this.name = Name;
-            guessedNumbers = new List<int>();
+            _ = new Esper(name);
+            this.reliabilityLevel = reliabilityLevel;
         }
 
-        public Esper(int ReliabilityLevel)
+        public Esper(int reliabilityLevel)
         {
-            this.reliabilityLevel = ReliabilityLevel;
-            guessIsMade = false;
-            this.name = "Случайный экстрасенс №" + (new System.Random()).Next().ToString(); 
-            guessedNumbers = new List<int>();
+            _ = new Esper();
+            this.reliabilityLevel = reliabilityLevel;
         }
 
         public void GuessNumber()

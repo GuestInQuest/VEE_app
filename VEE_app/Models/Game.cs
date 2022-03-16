@@ -12,68 +12,91 @@ namespace VEE_app.Models
         EspersGuessedNumber
     }
 
-    public interface IAbstractFactory
+    public interface IFactory
     {
-        IAbstractGame CreateGame();
+        IGame Create();
     }
 
-    public interface IAbstractGame
+    public interface IGame
     {
-        Tester tester { get; set; }
-        List<Esper> espers { get; set; }
-        int espersCount { get; set; }
-        GameStates gameState { get; set; }
-        bool hasError { get; set; }
-        string errorMessage { get; set; }
+        Tester Tester { get; }
+        List<Esper> Espers { get; }
+        GameStates State { get; }
+        bool HasError { get; }
+        string ErrorMessage { get; }
         void GuessNumberByEspers();
         void ResolveEspersGuesses(int submittedNumber);
     }
 
-    public class GameFactory : IAbstractFactory
+    public class GameFactory : IFactory
     {
-        public IAbstractGame CreateGame()
+        public IGame Create()
         {
             return new Game();
         }
     }
 
-    public class Game: IAbstractGame
+    public class Game: IGame
     {
-        public Tester tester { get; set; }
-        public List<Esper> espers { get; set; }
-        public int espersCount { get; set; }
-        public GameStates gameState { get; set; }
-        public bool hasError { get; set; }
-        public string errorMessage { get; set; }
+        public Tester Tester { get; set; }
+        public List<Esper> Espers { get; set; }
+        public GameStates State { get; set; }
+        public bool HasError { get; set; }
+        public string ErrorMessage { get; set; }
+        private int espersCount { get; set; }
+
+        public void NewGame()
+        {
+            List<string> names = new List<string> { "Всевидящая",
+                                                    "Прорицатель",
+                                                    "Потомственный красный колдун",
+                                                    "Шаман",
+                                                    "Великий экстрасенс",
+                                                    "Отшельник",
+                                                    "Иллюзионист",
+                                                    "Психолог",
+                                                    "Обманщик",
+                                                    "Шарлатан"};
+            var rand = new System.Random();
+            espersCount = rand.Next(2, 11);
+            Espers = new List<Esper>();
+            //При создании экстрасенсов удаляем из списка уже использованные имена
+            for (int i = 0, j = 0; i < espersCount; i++)
+            {
+                j = rand.Next(0, names.Count);
+                Espers.Add(new Esper(names[j]));
+                names.RemoveAt(j);
+            }
+            HasError = false;
+            Tester = new Tester();
+        }
 
         public void GuessNumberByEspers()
         {
-            hasError = false;
-            foreach (Esper e in espers)
+            HasError = false;
+            foreach (Esper e in Espers)
                 e.GuessNumber();
-            gameState = GameStates.EspersGuessedNumber;
+            State = GameStates.EspersGuessedNumber;
         }
 
         public void ResolveEspersGuesses(int submittedNumber)
         {
-            hasError = false;
-            if (tester.ValidateNumber(submittedNumber))
+            if (!Tester.ValidateNumber(submittedNumber))
             {
-                tester.AddNumber(submittedNumber);
-                foreach (Esper e in espers)
-                {
-                    e.ReliabilityCheck(tester.currentNumber);
-                    e.PrepareToGuess();
-                }
-                tester.ArchiveNumber();
-                gameState = GameStates.EspersReadyToGuess;
+                State = GameStates.EspersGuessedNumber;
+                HasError = true;
+                ErrorMessage = "Попробуйте ещё раз, загадать нужно было двузначное число";
+                return;                
             }
-            else
+            HasError = false;
+            Tester.AddNumber(submittedNumber);
+            foreach (Esper e in Espers)
             {
-                gameState = GameStates.EspersGuessedNumber;
-                hasError = true;
-                errorMessage = "Попробуйте ещё раз, загадать нужно было двузначное число";
+                e.ReliabilityCheck(Tester.currentNumber);
+                e.PrepareToGuess();
             }
+            Tester.ArchiveNumber();
+            State = GameStates.EspersReadyToGuess;
         }
     }
 }

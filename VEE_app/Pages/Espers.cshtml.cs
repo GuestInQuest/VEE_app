@@ -34,7 +34,7 @@ namespace VEE_app.Pages
 
         public void OnGet()
         {
-            game = (new GameFactory()).CreateGame();
+            game = (new GameFactory()).Create();
             GetGameData();
             if (game.hasError)
                 ModelState.AddModelError("SubmittedNumber", game.errorMessage);
@@ -42,7 +42,7 @@ namespace VEE_app.Pages
 
         public IActionResult OnPostGuess()
         {
-            game = (new GameFactory()).CreateGame();
+            game = (new GameFactory()).Create();
             GetGameData();
             game.GuessNumberByEspers();
             SaveGameData();
@@ -51,7 +51,7 @@ namespace VEE_app.Pages
 
         public IActionResult OnPostUnveil()
         {
-            game = (new GameFactory()).CreateGame();
+            game = (new GameFactory()).Create();
             GetGameData();
             game.ResolveEspersGuesses(SubmittedNumber);
             SaveGameData();
@@ -66,7 +66,7 @@ namespace VEE_app.Pages
         
         public Tester GetTester()
         {
-            return game.tester;
+            return game.Tester;
         }
 
         public GameStates GetGameState()
