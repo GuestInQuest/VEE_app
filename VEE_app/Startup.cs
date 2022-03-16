@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VEE_app.Models;
 
 namespace VEE_app
 {
@@ -33,6 +34,8 @@ namespace VEE_app
             });
             services.AddRazorPages();
             services.AddHttpContextAccessor();
+            services.AddScoped<IGameFactory, GameFactory>();
+            services.AddScoped<IStorage, Storage>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

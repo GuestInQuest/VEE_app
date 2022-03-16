@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using VEE_app.Models;
 
 
@@ -11,67 +12,69 @@ namespace VEE_app.Pages
     
     public class EspersModel : PageModel
     {
-        private readonly ILogger<EspersModel> _logger;
+        private readonly ILogger<EspersModel> logger;
+        private readonly IGameFactory gameFactory;
+        private readonly IStorage storage;
 
         [BindProperty]
+        [Range(0, 999.99)]
         public int SubmittedNumber { get; set; }
-        IAbstractGame game { get; set; }
+        IGame Game { get; set; }
 
-        public void SaveGameData()
+        public EspersModel(ILogger<EspersModel> logger, IGameFactory gameFactory, IStorage storage)
         {
-            (new Storage()).SaveGameData(game);
-        }
-
-        public void GetGameData()
-        {
-            (new Storage()).getGameData(game);
-        }
-
-        public EspersModel(ILogger<EspersModel> logger)
-        {
-            _logger = logger;
-        }
+            this.logger = logger;
+            this.gameFactory = gameFactory;
+            this.storage = storage;
+        }       
 
         public void OnGet()
         {
-            game = (new GameFactory()).CreateGame();
-            GetGameData();
-            if (game.hasError)
-                ModelState.AddModelError("SubmittedNumber", game.errorMessage);
+            if (!storage.IsGameStateSaved())
+            {
+                Game = gameFactory.Create();
+                storage.SaveGame(Game);
+            }
+            else
+            {
+                Game = storage.LoadGame();
+            }
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("SubmittedNumber", Game.ErrorMessage);
+            }
         }
 
         public IActionResult OnPostGuess()
         {
-            game = (new GameFactory()).CreateGame();
-            GetGameData();
-            game.GuessNumberByEspers();
-            SaveGameData();
+            Game = storage.LoadGame();
+            Game.GuessNumberByEspers();
+            storage.SaveGame(Game);
             return RedirectToPage("/Espers");
         }
 
         public IActionResult OnPostUnveil()
         {
-            game = (new GameFactory()).CreateGame();
-            GetGameData();
-            game.ResolveEspersGuesses(SubmittedNumber);
-            SaveGameData();
-            return RedirectToPage("/Espers");
+            Game = storage.LoadGame();
+            Game.ResolveEspersGuesses(SubmittedNumber);
+            storage.SaveGame(Game);
+            return RedirectToPage("/Espers");         
         }
 
         //Следующие три метода добавил из-за того, что на самой странице "'EspersModel.game' is inaccessible due to its protection level"
         public List<Esper> GetEspers()
         {
-            return game.espers;
+            return Game.Espers;
         }
         
         public Tester GetTester()
         {
-            return game.tester;
+            return Game.Tester;
         }
 
         public GameStates GetGameState()
         {
-            return game.gameState;
+            return Game.State;
         }
     }
 }

@@ -4,64 +4,64 @@ namespace VEE_app.Models
 {
     public class Esper
     {
-        public string name { get; set; }
-        public int reliabilityLevel { get; set; }
-        public int currentGuess { get; set; }
-        public System.Collections.Generic.List<int> guessedNumbers { get; set; }
-        public bool guessIsMade { get; set; }
+        public string Name { get; private set; }
+        public int ReliabilityLevel { get; private set; }
+        public int CurrentGuess { get; private set; }
+        public System.Collections.Generic.List<int> GuessedNumbers { get; private set; }
         private int reliabilityStep;
-        public Esper()
-        {
-            reliabilityLevel = 100;
-            guessIsMade = false;
-            this.name = "Случайный экстрасенс №" + (new System.Random()).Next().ToString();
-            guessedNumbers = new List<int>();
-            reliabilityStep = 5;
-        }
 
         public Esper(string name)
         {
-            reliabilityLevel = 100;
-            guessIsMade = false;
-            this.name = name;
-            guessedNumbers = new List<int>();
+            ReliabilityLevel = 100;
+            this.Name = name;
+            GuessedNumbers = new List<int>();
             reliabilityStep = 5;
         }
 
-        public Esper(string Name, int ReliabilityLevel)
+        public Esper(EsperDTO esperDTO):this(esperDTO.Name)
         {
-            this.reliabilityLevel = ReliabilityLevel;
-            guessIsMade = false;
-            this.name = Name;
-            guessedNumbers = new List<int>();
-        }
-
-        public Esper(int ReliabilityLevel)
-        {
-            this.reliabilityLevel = ReliabilityLevel;
-            guessIsMade = false;
-            this.name = "Случайный экстрасенс №" + (new System.Random()).Next().ToString(); 
-            guessedNumbers = new List<int>();
+            ReliabilityLevel = esperDTO.ReliabilityLevel;
+            GuessedNumbers = esperDTO.GuessedNumbers;
+            CurrentGuess = esperDTO.CurrentGuess;
         }
 
         public void GuessNumber()
         {
-            currentGuess = new System.Random().Next(10,100);
-            guessIsMade = true;
+            CurrentGuess = new System.Random().Next(10, 100);
         }
-        
+
         public void ReliabilityCheck(int CurrentNumb)
         {
-            if (currentGuess == CurrentNumb)
-                reliabilityLevel += reliabilityStep;
+            if (CurrentGuess == CurrentNumb)
+                ReliabilityLevel += reliabilityStep;
             else
-                reliabilityLevel -= reliabilityStep;
+                ReliabilityLevel -= reliabilityStep;
         }
 
         public void PrepareToGuess()
         {
-            guessedNumbers.Insert(0, currentGuess);
-            guessIsMade = false;
+            GuessedNumbers.Insert(0, CurrentGuess);
         }
+
+        public EsperDTO GetDTO()
+        {
+            EsperDTO EsperDTO = new()
+            {
+                Name = Name,
+                ReliabilityLevel = ReliabilityLevel,
+                CurrentGuess = CurrentGuess,
+                GuessedNumbers = GuessedNumbers
+            };
+            return EsperDTO;
+        }
+    }
+
+
+    public class EsperDTO
+    {
+        public string Name { get; set; }
+        public int ReliabilityLevel { get; set; }
+        public int CurrentGuess { get; set; }
+        public List<int> GuessedNumbers { get; set; }
     }
 }

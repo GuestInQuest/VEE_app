@@ -23,15 +23,15 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.reliabilityLevel)
+                    @Html.DisplayFor(modelItem => item.ReliabilityLevel)
                 </td>
                 <td>
-                    @if(item.guessIsMade) @Html.DisplayFor(modelItem => item.currentGuess)
+                    @if(@Model.GetGameState() == Models.GameStates.EspersGuessedNumber) @Html.DisplayFor(modelItem => item.CurrentGuess)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.name)
+                    @Html.DisplayFor(modelItem => item.Name)
                 </td>
-                @foreach (var numb in item.guessedNumbers)
+                @foreach (var numb in item.GuessedNumbers)
                 {
                     <td>
                         @Html.DisplayFor(modelItem => numb)
@@ -48,7 +48,7 @@
         <th>
             Ранее загаданные числа
         </th>
-        @foreach (var numb in @Model.GetTester().numbHistory)
+        @foreach (var numb in @Model.GetTester().NumbHistory)
         {
             <td>
                 @Html.DisplayFor(modelItem => numb)
