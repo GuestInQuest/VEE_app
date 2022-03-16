@@ -22,9 +22,7 @@ namespace VEE_app.Models
     {
         Tester Tester { get; }
         List<Esper> Espers { get; }
-        GameStates State { get; }
-        bool HasError { get; }
-        string ErrorMessage { get; }
+        GameStates State { get; } 
         void GuessNumberByEspers();
         void ResolveEspersGuesses(int submittedNumber);
         GameDTO GetDTO();
@@ -47,9 +45,6 @@ namespace VEE_app.Models
         public Tester Tester { get; private set; }
         public List<Esper> Espers { get; private set; }
         public GameStates State { get; private set; }
-        public bool HasError { get; private set; }
-        public string ErrorMessage { get; private set; }
-
         public Game()
         {
             List<string> names = new List<string> { "Всевидящая",
@@ -71,7 +66,6 @@ namespace VEE_app.Models
                 Espers.Add(new Esper(names[j]));
                 names.RemoveAt(j);
             }
-            HasError = false;
             Tester = new();
         }
 
@@ -79,8 +73,6 @@ namespace VEE_app.Models
         {
             Tester = new(GameDTO.TesterDTO);
             State = GameDTO.State;
-            HasError = GameDTO.HasError;
-            ErrorMessage = GameDTO.ErrorMessage;
             Espers = new();
             foreach (EsperDTO e in GameDTO.EspersDTO)
             {
@@ -90,7 +82,6 @@ namespace VEE_app.Models
 
         public void GuessNumberByEspers()
         {
-            HasError = false;
             foreach (Esper e in Espers)
                 e.GuessNumber();
             State = GameStates.EspersGuessedNumber;
@@ -98,16 +89,6 @@ namespace VEE_app.Models
 
         public void ResolveEspersGuesses(int submittedNumber)
         {
-            if (!Tester.ValidateNumber(submittedNumber))
-            {
-                Tester.AddNumber(submittedNumber);
-                State = GameStates.EspersGuessedNumber;
-                HasError = true;
-                ErrorMessage = "Попробуйте ещё раз, загадать нужно было двузначное число";
-                return;               
-            }
-
-            HasError = false;
             Tester.AddNumber(submittedNumber);
             foreach (Esper e in Espers)
             {
@@ -123,9 +104,7 @@ namespace VEE_app.Models
             GameDTO GameDTO = new()
             {
                 TesterDTO = Tester.GetDTO(),
-                State = State,
-                HasError = HasError,
-                ErrorMessage = ErrorMessage
+                State = State
             };
             GameDTO.EspersDTO = new();
             foreach (Esper e in Espers)
@@ -141,8 +120,6 @@ namespace VEE_app.Models
         public TesterDTO TesterDTO { get; set; }
         public List<EsperDTO> EspersDTO { get; set; }
         public GameStates State { get; set; }
-        public bool HasError { get; set; }
-        public string ErrorMessage { get; set; }
     }
 
 }

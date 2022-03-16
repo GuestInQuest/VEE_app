@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace VEE_app.Models
 {
-    public class Tester : IValidatableObject
+    public class Tester
     {
-
-        [Range(0, 99)]
         public int CurrentNumber { get; private set; }
         public List<int> NumbHistory { get; private set; }
         private bool numberIsArchived;
@@ -25,22 +23,6 @@ namespace VEE_app.Models
             CurrentNumber = TesterDTO.CurrentNumber;
             NumbHistory = TesterDTO.NumbHistory;
             numberIsArchived = TesterDTO.NumberIsArchived;
-        }
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (CurrentNumber is < 10 or > 99)
-            {
-                yield return new ValidationResult(
-                    $"Попробуйте ещё раз, загадать нужно было двузначное число, а вы загадали {CurrentNumber}.",
-                    new[] { nameof(CurrentNumber) });
-            }
-        }
-
-        public bool ValidateNumber(int number)
-        {
-            if (number is < 10 or > 99)
-                return false;
-            else return true;
         }
 
         public void AddNumber(int number)

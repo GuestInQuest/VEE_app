@@ -17,7 +17,8 @@ namespace VEE_app.Pages
         private readonly IStorage storage;
 
         [BindProperty]
-        [Range(0, 999.99)]
+
+        [Range(10, 99, ErrorMessage = "Попробуйте ещё раз, загадать нужно было число от 10 до 99")]
         public int SubmittedNumber { get; set; }
         IGame Game { get; set; }
 
@@ -39,10 +40,6 @@ namespace VEE_app.Pages
             {
                 Game = storage.LoadGame();
             }
-            if (!ModelState.IsValid)
-            {
-                ModelState.AddModelError("SubmittedNumber", Game.ErrorMessage);
-            }
         }
 
         public IActionResult OnPostGuess()
@@ -56,6 +53,12 @@ namespace VEE_app.Pages
         public IActionResult OnPostUnveil()
         {
             Game = storage.LoadGame();
+
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
             Game.ResolveEspersGuesses(SubmittedNumber);
             storage.SaveGame(Game);
             return RedirectToPage("/Espers");         
