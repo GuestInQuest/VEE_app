@@ -2,45 +2,40 @@
 
 namespace VEE_app.Models
 {
-    public class Esper
+    public class Esper : NumberMemorizer
     {
         public string Name { get; private set; }
         public int ReliabilityLevel { get; private set; }
-        public int CurrentGuess { get; private set; }
-        public System.Collections.Generic.List<int> GuessedNumbers { get; private set; }
+
         private int reliabilityStep;
 
-        public Esper(string name)
+        public Esper(string name):base()
         {
             ReliabilityLevel = 100;
             this.Name = name;
-            GuessedNumbers = new List<int>();
             reliabilityStep = 5;
         }
 
         public Esper(EsperDTO esperDTO):this(esperDTO.Name)
         {
             ReliabilityLevel = esperDTO.ReliabilityLevel;
-            GuessedNumbers = esperDTO.GuessedNumbers;
-            CurrentGuess = esperDTO.CurrentGuess;
+            numberHistory = esperDTO.GuessedNumbers;
+            CurrentNumber = esperDTO.CurrentGuess;
+            numberIsArchived = esperDTO.NumberIsArchived;
         }
 
         public void GuessNumber()
         {
-            CurrentGuess = new System.Random().Next(10, 100);
+            CurrentNumber = new System.Random().Next(10, 100);
+            numberIsArchived = false;
         }
 
-        public void ReliabilityCheck(int CurrentNumb)
+        public void ReliabilityCheck(int CurrentNumber)
         {
-            if (CurrentGuess == CurrentNumb)
+            if (this.CurrentNumber == CurrentNumber)
                 ReliabilityLevel += reliabilityStep;
             else
                 ReliabilityLevel -= reliabilityStep;
-        }
-
-        public void PrepareToGuess()
-        {
-            GuessedNumbers.Insert(0, CurrentGuess);
         }
 
         public EsperDTO GetDTO()
@@ -49,8 +44,9 @@ namespace VEE_app.Models
             {
                 Name = Name,
                 ReliabilityLevel = ReliabilityLevel,
-                CurrentGuess = CurrentGuess,
-                GuessedNumbers = GuessedNumbers
+                CurrentGuess = CurrentNumber,
+                GuessedNumbers = numberHistory,
+                NumberIsArchived = numberIsArchived
             };
             return EsperDTO;
         }
@@ -63,5 +59,6 @@ namespace VEE_app.Models
         public int ReliabilityLevel { get; set; }
         public int CurrentGuess { get; set; }
         public List<int> GuessedNumbers { get; set; }
+        public bool NumberIsArchived { get; set; }
     }
 }

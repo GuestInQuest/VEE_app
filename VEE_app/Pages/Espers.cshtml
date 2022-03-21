@@ -19,22 +19,22 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in @Model.GetEspers())
+        @foreach (var esper in @Model.GetEspers())
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ReliabilityLevel)
+                    @Html.DisplayFor(modelItem => esper.ReliabilityLevel)
                 </td>
                 <td>
-                    @if(@Model.GetGameState() == Models.GameStates.EspersGuessedNumber) @Html.DisplayFor(modelItem => item.CurrentGuess)
+                    @if(@Model.GetGameState() == Models.GameStates.EspersGuessedNumber) @Html.DisplayFor(modelItem => esper.CurrentNumber)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.DisplayFor(modelItem => esper.Name)
                 </td>
-                @foreach (var numb in item.GuessedNumbers)
+                @foreach (var number in esper.NumberHistory)
                 {
                     <td>
-                        @Html.DisplayFor(modelItem => numb)
+                        @Html.DisplayFor(modelItem => number)
                     </td>
                 }
             </tr>
@@ -48,10 +48,10 @@
         <th>
             Ранее загаданные числа
         </th>
-        @foreach (var numb in @Model.GetTester().NumbHistory)
+        @foreach (var number in @Model.GetTester().NumberHistory)
         {
             <td>
-                @Html.DisplayFor(modelItem => numb)
+                @Html.DisplayFor(modelItem => number)
             </td>            
         }
     </tr>

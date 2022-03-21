@@ -6,22 +6,15 @@ using System.Threading.Tasks;
 
 namespace VEE_app.Models
 {
-    public class Tester
+    public class Tester : NumberMemorizer
     {
-        public int CurrentNumber { get; private set; }
-        public List<int> NumbHistory { get; private set; }
-        private bool numberIsArchived;
-
-        public Tester()
-        {
-            NumbHistory = new List<int>();
-            numberIsArchived = false;
-        }
+        public Tester() : base()
+        { }
 
         public Tester(TesterDTO TesterDTO)
         {
             CurrentNumber = TesterDTO.CurrentNumber;
-            NumbHistory = TesterDTO.NumbHistory;
+            numberHistory = TesterDTO.NumberHistory;
             numberIsArchived = TesterDTO.NumberIsArchived;
         }
 
@@ -31,31 +24,22 @@ namespace VEE_app.Models
             numberIsArchived = false;
         }
 
-        public void ArchiveNumber()
-        {
-            if (!numberIsArchived)
-            {
-                NumbHistory.Insert(0, CurrentNumber);
-                numberIsArchived = true;
-            }
-        }
         public TesterDTO GetDTO()
         {
             TesterDTO TesterDTO = new()
             {
                 CurrentNumber = CurrentNumber,
-                NumbHistory = NumbHistory,
+                NumberHistory = numberHistory,
                 NumberIsArchived = numberIsArchived    
             };
             return TesterDTO;
         }
     }
 
-
     public class TesterDTO
     {
         public int CurrentNumber { get; set; }
-        public List<int> NumbHistory { get; set; }
+        public List<int> NumberHistory { get; set; }
         public bool NumberIsArchived { get; set; }
     }
 }

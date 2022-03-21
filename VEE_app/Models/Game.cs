@@ -21,7 +21,7 @@ namespace VEE_app.Models
     public interface IGame
     {
         Tester Tester { get; }
-        List<Esper> Espers { get; }
+        Esper[] Espers { get; }
         GameStates State { get; } 
         void GuessNumberByEspers();
         void ResolveEspersGuesses(int submittedNumber);
@@ -43,27 +43,33 @@ namespace VEE_app.Models
     public class Game : IGame
     {
         public Tester Tester { get; private set; }
-        public List<Esper> Espers { get; private set; }
+        public Esper[] Espers
+        {
+            get { return espers.ToArray(); }
+        }
         public GameStates State { get; private set; }
+
+        private List<Esper> espers;
+
         public Game()
         {
-            List<string> names = new List<string> { "Всевидящая",
-                                                    "Прорицатель",
-                                                    "Потомственный красный колдун",
-                                                    "Шаман",
-                                                    "Великий экстрасенс",
-                                                    "Отшельник",
-                                                    "Иллюзионист",
-                                                    "Психолог",
-                                                    "Обманщик",
-                                                    "Шарлатан"};
+            var names = new List<string> { "Всевидящая",
+                                           "Прорицатель",
+                                           "Потомственный красный колдун",
+                                           "Шаман",
+                                           "Великий экстрасенс",
+                                           "Отшельник",
+                                           "Иллюзионист",
+                                           "Психолог",
+                                           "Обманщик",
+                                           "Шарлатан"};
             var rand = new System.Random();
-            Espers = new();
+            espers = new();
             //При создании экстрасенсов удаляем из списка уже использованные имена
             for (int i = 0; i < rand.Next(2, 11); i++)
             {
                 int j = rand.Next(0, names.Count);
-                Espers.Add(new Esper(names[j]));
+                espers.Add(new Esper(names[j]));
                 names.RemoveAt(j);
             }
             Tester = new();
@@ -73,27 +79,27 @@ namespace VEE_app.Models
         {
             Tester = new(GameDTO.TesterDTO);
             State = GameDTO.State;
-            Espers = new();
+            espers = new();
             foreach (EsperDTO e in GameDTO.EspersDTO)
             {
-                Espers.Add(new Esper(e));
+                espers.Add(new Esper(e));
             }
         }
 
         public void GuessNumberByEspers()
         {
-            foreach (Esper e in Espers)
-                e.GuessNumber();
+            foreach (Esper esper in espers)
+                esper.GuessNumber();            
             State = GameStates.EspersGuessedNumber;
         }
 
         public void ResolveEspersGuesses(int submittedNumber)
         {
             Tester.AddNumber(submittedNumber);
-            foreach (Esper e in Espers)
+            foreach (Esper esper in espers)
             {
-                e.ReliabilityCheck(Tester.CurrentNumber);
-                e.PrepareToGuess();
+                esper.ReliabilityCheck(Tester.CurrentNumber);
+                esper.ArchiveNumber();
             }
             Tester.ArchiveNumber();
             State = GameStates.EspersReadyToGuess;
@@ -107,9 +113,9 @@ namespace VEE_app.Models
                 State = State
             };
             GameDTO.EspersDTO = new();
-            foreach (Esper e in Espers)
+            foreach (Esper esper in espers)
             {
-                GameDTO.EspersDTO.Add(e.GetDTO());
+                GameDTO.EspersDTO.Add(esper.GetDTO());
             }
             return GameDTO;
         }

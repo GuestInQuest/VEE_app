@@ -65,7 +65,7 @@ namespace VEE_app.Pages
         }
 
         //Следующие три метода добавил из-за того, что на самой странице "'EspersModel.game' is inaccessible due to its protection level"
-        public List<Esper> GetEspers()
+        public Esper[] GetEspers()
         {
             return Game.Espers;
         }

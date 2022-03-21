@@ -30,37 +30,31 @@ namespace VEE_app.Models
 
     public class Storage : IStorage
     {
-        private int isGameStateSaved;
-        private IHttpContextAccessor httpContextAccessor;
+        private ISession currentSession;
         private IGameFactory gameFactory;
 
         public const string SessionKeyGameDTO = "_GameDTO";
-        public const string SessionKeyIsGameStateSaved = "_IsGameStateSaved";
 
-        public Storage(IGameFactory gameFactory)
+        public Storage(IGameFactory gameFactory, IHttpContextAccessor httpContextAccessor)
         {
-            httpContextAccessor = new HttpContextAccessor();
             this.gameFactory = gameFactory;
+            currentSession = httpContextAccessor.HttpContext.Session;
         }
 
         public IGame LoadGame()
         {
-            IGame game = gameFactory.Create(httpContextAccessor.HttpContext.Session.Get<GameDTO>(SessionKeyGameDTO));
+            IGame game = gameFactory.Create(currentSession.Get<GameDTO>(SessionKeyGameDTO));
             return game;
         }
 
         public void SaveGame(IGame iGame)
         {
-            httpContextAccessor.HttpContext.Session.Set(SessionKeyGameDTO, iGame.GetDTO());
-            isGameStateSaved = 1;
-            httpContextAccessor.HttpContext.Session.Set(SessionKeyIsGameStateSaved, isGameStateSaved);
+            currentSession.Set(SessionKeyGameDTO, iGame.GetDTO());
         }
 
         public bool IsGameStateSaved()
         {
-            if (httpContextAccessor.HttpContext.Session.Get<int>(SessionKeyIsGameStateSaved) == default)
-                return false;
-            return true;
+            return currentSession.Keys.Contains(SessionKeyGameDTO);
         }
     }
 }
